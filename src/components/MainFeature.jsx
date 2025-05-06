@@ -429,9 +429,9 @@ const MainFeature = () => {
                     style={{
                       top: rowIndex * 60,
                       left: colIndex * 60,
-                      width: line ? 4 : 2, 
                       width: line ? 8 : 4, 
-                      transform: 'translateX(-50%)',
+                      height: 60,
+                      transform: 'translateX(-50%)'
                     }}
                     onClick={() => handleLineClick('vertical', rowIndex, colIndex)}
                   />
