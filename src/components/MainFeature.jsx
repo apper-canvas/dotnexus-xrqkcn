@@ -410,7 +410,7 @@ const MainFeature = () => {
                       top: rowIndex * 60,
                       left: colIndex * 60,
                       width: 60,
-                      height: line ? 4 : 2, 
+                      height: line ? 8 : 4, 
                       transform: 'translateY(-50%)',
                     }}
                     onClick={() => handleLineClick('horizontal', rowIndex, colIndex)}
@@ -430,7 +430,7 @@ const MainFeature = () => {
                       top: rowIndex * 60,
                       left: colIndex * 60,
                       width: line ? 4 : 2, 
-                      height: 60, 
+                      width: line ? 8 : 4, 
                       transform: 'translateX(-50%)',
                     }}
                     onClick={() => handleLineClick('vertical', rowIndex, colIndex)}
