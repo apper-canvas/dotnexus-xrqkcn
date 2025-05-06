@@ -33,13 +33,6 @@ const MainFeature = () => {
   useEffect(() => {
     initializeScores();
   }, [playerCount]);
-  const RefreshCwIcon = getIcon('RefreshCw');
-  const TrophyIcon = getIcon('Trophy');
-  const UserIcon = getIcon('User');
-  const UsersIcon = getIcon('Users');
-  const GridIcon = getIcon('Grid');
-  const XIcon = getIcon('X');
-  const CheckIcon = getIcon('Check');
   
   // Player colors for up to 6 players
   const playerColors = {
@@ -210,8 +203,6 @@ const MainFeature = () => {
     // Check if the game is over
     const totalBoxes = gridSize * gridSize;
     const filledBoxes = scores.player1 + scores.player2 + (boxCompleted ? 1 : 0);
-    
-    const filledBoxes = Object.values(scores).reduce((sum, score) => sum + score, 0) + (boxCompleted ? 1 : 0);
       setGameOver(true);
       
       setTimeout(() => {
@@ -257,7 +248,6 @@ const MainFeature = () => {
     setGridSize(size);
     setCustomizing(false);
     toast.success(`Grid size set to ${size}x${size}`);
-    toast.success(`Grid size set to ${size}x${size}`);
   };
   
   const savePlayerCount = (count) => {
@@ -268,6 +258,10 @@ const MainFeature = () => {
     setCurrentPlayer(1);
     initializeScores();
   };
+  
+  // Calculate if there's a tie for the highest score
+  const highestScore = Math.max(...Object.values(scores));
+  const hasTie = gameOver && Object.values(scores).filter(score => score === highestScore).length > 1;
   
   return (
     <div className="container mx-auto px-4 py-8 md:py-12">
@@ -332,7 +326,7 @@ const MainFeature = () => {
                       <div className={`text-2xl font-bold ${playerColors[playerNum]}`}>{playerScore}</div>
                       <div className="text-sm text-surface-500">boxes</div>
                       
-                      {gameOver && isHighestScore && !isTie && (
+                      {gameOver && isHighestScore && !hasTie && (
                         <div className={`ml-auto flex items-center gap-1 ${playerColors[playerNum]} font-medium`}>
                           <TrophyIcon size={16} />
                           <span>Winner!</span>
@@ -375,7 +369,7 @@ const MainFeature = () => {
               
               <div className="flex justify-between">
                 <span>Boxes Remaining:</span>
-                <span className="font-medium">{gridSize * gridSize - (scores.player1 + scores.player2)}</span>
+                <span className="font-medium">{gridSize * gridSize - Object.values(scores).reduce((sum, score) => sum + score, 0)}</span>
               </div>
             </div>
           </div>
