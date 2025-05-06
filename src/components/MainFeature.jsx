@@ -11,13 +11,28 @@ const MainFeature = () => {
     verticalLines: [],
     boxes: []
   });
-  const [currentPlayer, setCurrentPlayer] = useState(1); // 1 or 2
-  const [scores, setScores] = useState({ player1: 0, player2: 0 });
+  const [playerCount, setPlayerCount] = useState(2);
+  const [currentPlayer, setCurrentPlayer] = useState(1);
+  const [scores, setScores] = useState({});
   const [gameOver, setGameOver] = useState(false);
   const [customizing, setCustomizing] = useState(false);
   
   // Icons
   const SettingsIcon = getIcon('Settings');
+  const MinusIcon = getIcon('Minus');
+  const PlusIcon = getIcon('Plus');
+  const UsersIcon = getIcon('Users');
+  const UserIcon = getIcon('User');
+  const GridIcon = getIcon('Grid');
+  const XIcon = getIcon('X');
+  const CheckIcon = getIcon('Check');
+  const RefreshCwIcon = getIcon('RefreshCw');
+  const TrophyIcon = getIcon('Trophy');
+  
+  // Initialize scores on player count change
+  useEffect(() => {
+    initializeScores();
+  }, [playerCount]);
   const RefreshCwIcon = getIcon('RefreshCw');
   const TrophyIcon = getIcon('Trophy');
   const UserIcon = getIcon('User');
@@ -26,14 +41,47 @@ const MainFeature = () => {
   const XIcon = getIcon('X');
   const CheckIcon = getIcon('Check');
   
+  // Player colors for up to 6 players
   const playerColors = {
-    1: 'text-primary',
-    2: 'text-secondary'
+    1: 'text-blue-500',
+    2: 'text-rose-500',
+    3: 'text-emerald-500',
+    4: 'text-amber-500',
+    5: 'text-purple-500',
+    6: 'text-cyan-500'
   };
   
   const playerBgColors = {
-    1: 'bg-primary',
-    2: 'bg-secondary'
+    1: 'bg-blue-500',
+    2: 'bg-rose-500',
+    3: 'bg-emerald-500',
+    4: 'bg-amber-500',
+    5: 'bg-purple-500',
+    6: 'bg-cyan-500'
+  };
+  
+  const playerBgColorsLight = {
+    1: 'bg-blue-500/20',
+    2: 'bg-rose-500/20',
+    3: 'bg-emerald-500/20',
+    4: 'bg-amber-500/20',
+    5: 'bg-purple-500/20',
+    6: 'bg-cyan-500/20'
+  };
+  
+  const playerRingColors = {
+    1: 'ring-blue-500',
+    2: 'ring-rose-500',
+    3: 'ring-emerald-500',
+    4: 'ring-amber-500',
+    5: 'ring-purple-500',
+    6: 'ring-cyan-500'
+  };
+  
+  const initializeScores = () => {
+    const newScores = {};
+    for (let i = 1; i <= playerCount; i++) newScores[`player${i}`] = 0;
+    setScores(newScores);
   };
   
   // Initialize game board
@@ -53,7 +101,7 @@ const MainFeature = () => {
       boxes
     });
     
-    setScores({ player1: 0, player2: 0 });
+    initializeScores();
     setCurrentPlayer(1);
     setGameOver(false);
   };
@@ -96,12 +144,8 @@ const MainFeature = () => {
           newGameBoard.boxes[boxRow][boxCol] = currentPlayer;
           boxCompleted = true;
           
-          // Update scores
-          if (currentPlayer === 1) {
-            setScores(prev => ({ ...prev, player1: prev.player1 + 1 }));
-          } else {
-            setScores(prev => ({ ...prev, player2: prev.player2 + 1 }));
-          }
+          // Update score for current player
+          setScores(prev => ({ ...prev, [`player${currentPlayer}`]: prev[`player${currentPlayer}`] + 1 }));
         }
       }
       
@@ -118,12 +162,8 @@ const MainFeature = () => {
           newGameBoard.boxes[boxRow][boxCol] = currentPlayer;
           boxCompleted = true;
           
-          // Update scores
-          if (currentPlayer === 1) {
-            setScores(prev => ({ ...prev, player1: prev.player1 + 1 }));
-          } else {
-            setScores(prev => ({ ...prev, player2: prev.player2 + 1 }));
-          }
+          // Update score for current player
+          setScores(prev => ({ ...prev, [`player${currentPlayer}`]: prev[`player${currentPlayer}`] + 1 }));
         }
       }
     } else if (lineType === 'vertical') {
@@ -141,12 +181,8 @@ const MainFeature = () => {
           boxCompleted = true;
           
           // Update scores
-          if (currentPlayer === 1) {
-            setScores(prev => ({ ...prev, player1: prev.player1 + 1 }));
-          } else {
-            setScores(prev => ({ ...prev, player2: prev.player2 + 1 }));
-          }
-        }
+          // Update score for current player
+          setScores(prev => ({ ...prev, [`player${currentPlayer}`]: prev[`player${currentPlayer}`] + 1 }));
       }
       
       // Check the box to the right (if not on rightmost column)
@@ -164,12 +200,8 @@ const MainFeature = () => {
           
           // Update scores
           if (currentPlayer === 1) {
-            setScores(prev => ({ ...prev, player1: prev.player1 + 1 }));
-          } else {
-            setScores(prev => ({ ...prev, player2: prev.player2 + 1 }));
-          }
-        }
-      }
+          // Update score for current player
+          setScores(prev => ({ ...prev, [`player${currentPlayer}`]: prev[`player${currentPlayer}`] + 1 }));
     }
     
     // Update the game board
@@ -179,15 +211,23 @@ const MainFeature = () => {
     const totalBoxes = gridSize * gridSize;
     const filledBoxes = scores.player1 + scores.player2 + (boxCompleted ? 1 : 0);
     
-    if (filledBoxes === totalBoxes) {
+    const filledBoxes = Object.values(scores).reduce((sum, score) => sum + score, 0) + (boxCompleted ? 1 : 0);
       setGameOver(true);
       
       setTimeout(() => {
         if (scores.player1 > scores.player2) {
           toast.success("Player 1 wins!");
+        // Find the player with the highest score
+        const highestScore = Math.max(...Object.values(scores));
+        const winners = Object.entries(scores)
+          .filter(([_, score]) => score + (boxCompleted && _ === `player${currentPlayer}` ? 1 : 0) === highestScore)
+          .map(([player]) => parseInt(player.replace('player', '')));
+        
+        if (winners.length > 1) {
+          toast.info(`It's a tie between Players ${winners.join(', ')}!`);
+        } else if (winners.length === 1) {
+          toast.success(`Player ${winners[0]} wins!`);
         } else if (scores.player2 > scores.player1) {
-          toast.success("Player 2 wins!");
-        } else {
           toast.info("It's a tie!");
         }
       }, 500);
@@ -197,7 +237,11 @@ const MainFeature = () => {
     if (!boxCompleted) {
       setCurrentPlayer(currentPlayer === 1 ? 2 : 1);
     } else {
-      toast.info("Box completed! You get another turn!");
+      // Move to the next player
+      const nextPlayer = currentPlayer % playerCount + 1;
+      setCurrentPlayer(nextPlayer);
+      
+      toast.info(`Player ${nextPlayer}'s turn`, { autoClose: 1000 });
     }
   };
   
@@ -213,6 +257,16 @@ const MainFeature = () => {
     setGridSize(size);
     setCustomizing(false);
     toast.success(`Grid size set to ${size}x${size}`);
+    toast.success(`Grid size set to ${size}x${size}`);
+  };
+  
+  const savePlayerCount = (count) => {
+    if (count < 2) count = 2;
+    if (count > 6) count = 6;
+    
+    setPlayerCount(count);
+    setCurrentPlayer(1);
+    initializeScores();
   };
   
   return (
@@ -250,65 +304,48 @@ const MainFeature = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         <div className="lg:col-span-4 xl:col-span-3 order-2 lg:order-1">
           <div className="card-neu p-6 mb-8">
-            <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+            <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
               <UsersIcon size={20} />
-              <span>Players</span>
+              <span>Players ({playerCount})</span>
             </h2>
             
             <div className="space-y-6">
-              <div className={`p-4 rounded-xl transition-all duration-300 ${currentPlayer === 1 ? 'bg-primary/10 dark:bg-primary/20 ring-2 ring-primary' : 'bg-surface-200/50 dark:bg-surface-700/50'}`}>
-                <div className="flex items-center gap-3 mb-2">
-                  <div className={`w-8 h-8 rounded-full ${playerBgColors[1]} flex items-center justify-center text-white`}>
-                    <UserIcon size={16} />
-                  </div>
-                  <h3 className="font-semibold text-lg">Player 1</h3>
-                  {currentPlayer === 1 && !gameOver && 
-                    <span className="ml-auto text-xs font-medium bg-primary/20 text-primary px-2 py-1 rounded-full">
-                      Current Turn
-                    </span>
-                  }
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="text-2xl font-bold text-primary">{scores.player1}</div>
-                  <div className="text-sm text-surface-500">boxes</div>
-                  
-                  {gameOver && scores.player1 > scores.player2 && (
-                    <div className="ml-auto flex items-center gap-1 text-primary font-medium">
-                      <TrophyIcon size={16} />
-                      <span>Winner!</span>
+              {Array.from({ length: playerCount }, (_, i) => i + 1).map(playerNum => {
+                const playerScore = scores[`player${playerNum}`] || 0;
+                const isCurrentPlayer = currentPlayer === playerNum && !gameOver;
+                const isHighestScore = gameOver && playerScore === Math.max(...Object.values(scores));
+                
+                return (
+                  <div key={`player-${playerNum}`} className={`p-4 rounded-xl transition-all duration-300 ${isCurrentPlayer ? `${playerBgColorsLight[playerNum]} ring-2 ${playerRingColors[playerNum]}` : 'bg-surface-200/50 dark:bg-surface-700/50'}`}>
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className={`w-8 h-8 rounded-full ${playerBgColors[playerNum]} flex items-center justify-center text-white`}>
+                        <UserIcon size={16} />
+                      </div>
+                      <h3 className="font-semibold text-lg">Player {playerNum}</h3>
+                      {isCurrentPlayer && 
+                        <span className={`ml-auto text-xs font-medium ${playerBgColorsLight[playerNum]} ${playerColors[playerNum]} px-2 py-1 rounded-full`}>
+                          Current Turn
+                        </span>
+                      }
                     </div>
-                  )}
-                </div>
-              </div>
-              
-              <div className={`p-4 rounded-xl transition-all duration-300 ${currentPlayer === 2 ? 'bg-secondary/10 dark:bg-secondary/20 ring-2 ring-secondary' : 'bg-surface-200/50 dark:bg-surface-700/50'}`}>
-                <div className="flex items-center gap-3 mb-2">
-                  <div className={`w-8 h-8 rounded-full ${playerBgColors[2]} flex items-center justify-center text-white`}>
-                    <UserIcon size={16} />
-                  </div>
-                  <h3 className="font-semibold text-lg">Player 2</h3>
-                  {currentPlayer === 2 && !gameOver && 
-                    <span className="ml-auto text-xs font-medium bg-secondary/20 text-secondary px-2 py-1 rounded-full">
-                      Current Turn
-                    </span>
-                  }
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="text-2xl font-bold text-secondary">{scores.player2}</div>
-                  <div className="text-sm text-surface-500">boxes</div>
-                  
-                  {gameOver && scores.player2 > scores.player1 && (
-                    <div className="ml-auto flex items-center gap-1 text-secondary font-medium">
-                      <TrophyIcon size={16} />
-                      <span>Winner!</span>
+                    <div className="flex items-center gap-2">
+                      <div className={`text-2xl font-bold ${playerColors[playerNum]}`}>{playerScore}</div>
+                      <div className="text-sm text-surface-500">boxes</div>
+                      
+                      {gameOver && isHighestScore && !isTie && (
+                        <div className={`ml-auto flex items-center gap-1 ${playerColors[playerNum]} font-medium`}>
+                          <TrophyIcon size={16} />
+                          <span>Winner!</span>
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-              </div>
+                  </div>
+                );
+              })}
               
-              {gameOver && scores.player1 === scores.player2 && (
-                <div className="p-4 bg-accent/10 dark:bg-accent/20 rounded-xl text-center">
-                  <p className="font-medium text-accent">It's a tie!</p>
+              {gameOver && hasTie && (
+                <div className="p-4 bg-purple-500/10 dark:bg-purple-500/20 rounded-xl text-center">
+                  <p className="font-medium text-purple-500">It's a tie!</p>
                 </div>
               )}
             </div>
@@ -333,7 +370,7 @@ const MainFeature = () => {
               
               <div className="flex justify-between">
                 <span>Boxes Claimed:</span>
-                <span className="font-medium">{scores.player1 + scores.player2}</span>
+                <span className="font-medium">{Object.values(scores).reduce((sum, score) => sum + score, 0)}</span>
               </div>
               
               <div className="flex justify-between">
@@ -427,7 +464,7 @@ const MainFeature = () => {
                       line ? `${playerColors[line]} bg-current` : 'bg-surface-300/50 dark:bg-surface-600/50 hover:bg-surface-400/70 dark:hover:bg-surface-500/70'
                     }`}
                     style={{
-                      top: rowIndex * 60,
+                      top: rowIndex * 60, 
                       left: colIndex * 60,
                       width: line ? 8 : 4, 
                       height: 60,
@@ -467,6 +504,42 @@ const MainFeature = () => {
                 >
                   <XIcon size={20} />
                 </button>
+              </div>
+              
+              <div className="mb-6">
+                <label className="block mb-2 font-medium">Number of Players</label>
+                <div className="flex gap-4 items-center">
+                  <button 
+                    className="p-1 rounded bg-surface-200 dark:bg-surface-700 disabled:opacity-50"
+                    onClick={() => setPlayerCount(Math.max(2, playerCount - 1))}
+                    disabled={playerCount <= 2}
+                  >
+                    <MinusIcon size={18} />
+                  </button>
+                  <input
+                    type="range"
+                    min="2"
+                    max="6"
+                    className="w-full h-2 bg-surface-200 rounded-lg appearance-none cursor-pointer dark:bg-surface-700"
+                    value={playerCount}
+                    onChange={(e) => setPlayerCount(parseInt(e.target.value))}
+                  />
+                  <button 
+                    className="p-1 rounded bg-surface-200 dark:bg-surface-700 disabled:opacity-50"
+                    onClick={() => setPlayerCount(Math.min(6, playerCount + 1))}
+                    disabled={playerCount >= 6}
+                  >
+                    <PlusIcon size={18} />
+                  </button>
+                  <span className="bg-surface-100 dark:bg-surface-700 px-3 py-1 rounded-lg min-w-[40px] text-center">
+                    {playerCount}
+                  </span>
+                </div>
+                <p className="text-sm text-surface-500 mt-2">
+                  {playerCount === 2 ? "Classic two-player game" : 
+                   playerCount <= 4 ? "Multi-player fun for small groups" : 
+                   "Challenge for larger groups"}
+                </p>
               </div>
               
               <div className="mb-6">
