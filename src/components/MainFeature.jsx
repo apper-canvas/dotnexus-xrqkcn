@@ -404,13 +404,13 @@ const MainFeature = () => {
                   <div
                     key={`h-line-${rowIndex}-${colIndex}`}
                     className={`absolute cursor-pointer transition-all duration-300 ${
-                      line ? playerColors[line] : 'bg-surface-300/50 dark:bg-surface-600/50 hover:bg-surface-400/70 dark:hover:bg-surface-500/70'
+                      line ? `${playerColors[line]} bg-current` : 'bg-surface-300/50 dark:bg-surface-600/50 hover:bg-surface-400/70 dark:hover:bg-surface-500/70'
                     }`}
                     style={{
                       top: rowIndex * 60,
                       left: colIndex * 60,
                       width: 60,
-                      height: line ? 4 : 2,
+                      height: line ? 4 : 2, 
                       transform: 'translateY(-50%)',
                     }}
                     onClick={() => handleLineClick('horizontal', rowIndex, colIndex)}
@@ -424,13 +424,13 @@ const MainFeature = () => {
                   <div
                     key={`v-line-${rowIndex}-${colIndex}`}
                     className={`absolute cursor-pointer transition-all duration-300 ${
-                      line ? playerColors[line] : 'bg-surface-300/50 dark:bg-surface-600/50 hover:bg-surface-400/70 dark:hover:bg-surface-500/70'
+                      line ? `${playerColors[line]} bg-current` : 'bg-surface-300/50 dark:bg-surface-600/50 hover:bg-surface-400/70 dark:hover:bg-surface-500/70'
                     }`}
                     style={{
                       top: rowIndex * 60,
                       left: colIndex * 60,
-                      width: line ? 4 : 2,
-                      height: 60,
+                      width: line ? 4 : 2, 
+                      height: 60, 
                       transform: 'translateX(-50%)',
                     }}
                     onClick={() => handleLineClick('vertical', rowIndex, colIndex)}
