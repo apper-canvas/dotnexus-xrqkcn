@@ -202,26 +202,30 @@ const MainFeature = () => {
     
     // Check if the game is over
     const totalBoxes = gridSize * gridSize;
-    const filledBoxes = scores.player1 + scores.player2 + (boxCompleted ? 1 : 0);
-      setGameOver(true);
-      
-      setTimeout(() => {
-        if (scores.player1 > scores.player2) {
-          toast.success("Player 1 wins!");
-        // Find the player with the highest score
-        const highestScore = Math.max(...Object.values(scores));
-        const winners = Object.entries(scores)
-          .filter(([_, score]) => score + (boxCompleted && _ === `player${currentPlayer}` ? 1 : 0) === highestScore)
-          .map(([player]) => parseInt(player.replace('player', '')));
+    const filledBoxes = Object.values(scores).reduce((sum, score) => sum + score, 0) + (boxCompleted ? 1 : 0);
+    
+    if (filledBoxes >= totalBoxes) {
+        setGameOver(true);
         
-        if (winners.length > 1) {
-          toast.info(`It's a tie between Players ${winners.join(', ')}!`);
-        } else if (winners.length === 1) {
-          toast.success(`Player ${winners[0]} wins!`);
-        } else if (scores.player2 > scores.player1) {
-          toast.info("It's a tie!");
-        }
-      }, 500);
+        setTimeout(() => {
+          // Find the player with the highest score
+          const highestScore = Math.max(...Object.values(scores));
+          const winners = Object.entries(scores)
+            .filter(([player, score]) => {
+              // Account for the just-completed box in the current player's score
+              const adjustedScore = score + (boxCompleted && player === `player${currentPlayer}` ? 1 : 0);
+              return adjustedScore === highestScore;
+            })
+            .map(([player]) => parseInt(player.replace('player', '')));
+          
+          if (winners.length > 1) {
+            toast.info(`It's a tie between Players ${winners.join(', ')}!`);
+          } else if (winners.length === 1) {
+            toast.success(`Player ${winners[0]} wins!`);
+          } else {
+            toast.info("It's a tie!");
+          }
+        }, 500);
     }
     
     // Switch to the next player if no box was completed
