@@ -1,0 +1,91 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import 'react-toastify/dist/ReactToastify.css';
+
+@layer base {
+  body {
+    @apply font-sans text-surface-800 dark:text-surface-200 antialiased;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading font-bold;
+  }
+  
+  h1 {
+    @apply text-4xl md:text-5xl;
+  }
+  
+  h2 {
+    @apply text-3xl md:text-4xl;
+  }
+  
+  h3 {
+    @apply text-2xl md:text-3xl;
+  }
+  
+  h4 {
+    @apply text-xl md:text-2xl;
+  }
+  
+  p {
+    @apply my-4;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply px-4 py-2 rounded-xl transition-all duration-300 font-medium focus:outline-none focus:ring-2 focus:ring-offset-2;
+  }
+  
+  .btn-primary {
+    @apply bg-primary hover:bg-primary-dark text-white focus:ring-primary-dark;
+  }
+  
+  .btn-secondary {
+    @apply bg-secondary hover:bg-secondary-dark text-white focus:ring-secondary-dark;
+  }
+  
+  .btn-outline {
+    @apply border-2 border-primary text-primary hover:bg-primary hover:text-white focus:ring-primary;
+  }
+  
+  .card {
+    @apply p-6 bg-white dark:bg-surface-800 rounded-2xl shadow-card dark:shadow-none;
+  }
+  
+  .card-neu {
+    @apply p-6 bg-surface-100 dark:bg-surface-800 rounded-2xl shadow-neu-light dark:shadow-neu-dark;
+  }
+  
+  .dot {
+    @apply w-4 h-4 rounded-full bg-surface-600 hover:bg-primary cursor-pointer;
+  }
+  
+  .line {
+    @apply absolute bg-current transition-all duration-300;
+  }
+  
+  .horizontal-line {
+    @apply h-1 top-[7px];
+  }
+  
+  .vertical-line {
+    @apply w-1 left-[7px];
+  }
+}
+
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent;
+  }
+}
